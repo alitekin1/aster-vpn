@@ -40,7 +40,7 @@ def main():
  if dest.exists() and not (dest/'.aster-publish-root').exists():raise RuntimeError('Refusing to overwrite a directory not created by this publisher')
  dest.mkdir(parents=True,exist_ok=True);(dest/'.aster-publish-root').write_text('Sanitized Aster publication snapshot.\n')
  for old in dest.rglob('*'):
-  if old.is_file() and '.git' not in old.relative_to(dest).parts and old.name!='.aster-publish-root' and old.relative_to(dest).as_posix() not in files:old.unlink()
+  if old.is_file() and not any(p in {'.git','.deps','build','__pycache__'} for p in old.relative_to(dest).parts) and old.name!='.aster-publish-root' and old.relative_to(dest).as_posix() not in files:old.unlink()
  for name,data in files.items():
   target=dest/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
  print(f'PASS: {len(files)} allowlisted files; private keys/tokens/home paths absent; local app data and history excluded.')

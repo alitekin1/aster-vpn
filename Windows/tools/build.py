@@ -15,12 +15,14 @@ def prepare_engine():
     if (target/'common/net/cnc/aster_halfclose.go').exists() and (target/'common/net/cnc/aster_halfclose.go').read_bytes()==patch.read_bytes() and (target/'.aster-freedom-patch').exists() and (target/'.aster-freedom-patch').read_bytes()==freedom.read_bytes(): return
     info=json.loads(subprocess.check_output(['go','mod','download','-json','github.com/xtls/xray-core@v1.260327.0'],cwd=ROOT/'Engine'))
     if target.exists():
+        target.chmod(0o755)
         for p in target.rglob('*'):
-            if p.is_file():p.chmod(0o644)
+            p.chmod(0o755 if p.is_dir() else 0o644)
         shutil.rmtree(target)
     shutil.copytree(info['Dir'],target)
+    target.chmod(0o755)
     for p in target.rglob('*'):
-        if p.is_file():p.chmod(0o644)
+        p.chmod(0o755 if p.is_dir() else 0o644)
     shutil.copy2(patch,target/'common/net/cnc/aster_halfclose.go')
     run([sys.executable,str(freedom)],cwd=ROOT/'Engine')
     shutil.copy2(freedom,target/'.aster-freedom-patch')
