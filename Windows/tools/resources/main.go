@@ -51,6 +51,8 @@ func main() {
 	rs.SetManifest(winres.AppManifest{Identity: winres.AssemblyIdentity{Name: "Aster.Windows", Version: v}, Description: "Aster — Your traffic. Your rules.", ExecutionLevel: winres.RequireAdministrator, DPIAwareness: winres.DPIPerMonitorV2, Compatibility: winres.Win10AndAbove, UseCommonControlsV6: true, LongPathAware: true})
 	vi := version.Info{FileVersion: v, ProductVersion: v}
 	vi.Set(0, version.ProductName, "Aster")
+	vi.Set(0, version.FileVersion, buildinfo.Version+".0")
+	vi.Set(0, version.ProductVersion, buildinfo.Version)
 	vi.Set(0, version.FileDescription, "Aster VPN for Windows")
 	rs.SetVersionInfo(vi)
 	for _, a := range []winres.Arch{winres.ArchAMD64, winres.ArchARM64} {

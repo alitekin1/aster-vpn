@@ -17,7 +17,11 @@ try {
     $p.Refresh()
     if ($p.ExitCode -ne 0) { throw "Setup failed ($($p.ExitCode))" }
     if (-not (Test-Path (Join-Path $installed 'Aster.exe'))) { throw 'Installed executable is missing' }
-    if (-not (Get-Item (Join-Path $installed 'Aster.exe')).VersionInfo.FileVersion.StartsWith((Select-String -Path 'internal/buildinfo/version.go' -Pattern 'const Version = "([0-9.]+)"').Matches[0].Groups[1].Value)) { throw 'Installed app version is wrong' }
+    $expected = (Select-String -Path 'internal/buildinfo/version.go' -Pattern 'const Version = "([0-9.]+)"').Matches[0].Groups[1].Value + '.0'
+    $info = (Get-Item (Join-Path $installed 'Aster.exe')).VersionInfo
+    $actual = "$($info.FileMajorPart).$($info.FileMinorPart).$($info.FileBuildPart).$($info.FilePrivatePart)"
+    if ($actual -ne $expected) { throw "Installed app version is $actual; expected $expected" }
+    Write-Host "Installed Aster file version: $actual"
     if (-not (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Aster')) { throw 'Uninstall registration is missing' }
     Add-Type @'
 using System;
