@@ -103,6 +103,7 @@ Function .onInit
  ${IfNot} ${Errors}
   StrCpy $UpdateMode "1"
  ${EndIf}
+ ClearErrors
  Call StopAster
 FunctionEnd
 
@@ -118,6 +119,7 @@ Section "Aster" SEC_MAIN
   SetErrorLevel 3
   Abort
  webviewok:
+ ClearErrors
  SetOutPath "$INSTDIR"
  !include "${INSTALL_FILES}"
  IfErrors installfailed
