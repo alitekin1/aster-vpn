@@ -12,7 +12,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Could not build state fixture' }
     & $fixture seed $data
     if ($LASTEXITCODE -ne 0) { throw 'Could not save encrypted fixture' }
-    $p = Start-Process $setup -ArgumentList '/S' -PassThru -Wait
+    $p = Start-Process $setup -ArgumentList '/S' -PassThru
+    if (-not $p.WaitForExit(180000)) { throw 'Setup timed out' }
+    $p.Refresh()
     if ($p.ExitCode -ne 0) { throw "Setup failed ($($p.ExitCode))" }
     if (-not (Test-Path (Join-Path $installed 'Aster.exe'))) { throw 'Installed executable is missing' }
     if (-not (Get-Item (Join-Path $installed 'Aster.exe')).VersionInfo.FileVersion.StartsWith((Select-String -Path 'internal/buildinfo/version.go' -Pattern 'const Version = "([0-9.]+)"').Matches[0].Groups[1].Value)) { throw 'Installed app version is wrong' }
@@ -40,7 +42,9 @@ public static class AsterWindow {
     }
     $first = Start-Process (Join-Path $installed 'Aster.exe') -PassThru
     [void](Wait-Aster)
-    $p = Start-Process $setup -ArgumentList '/S','/UPDATE' -PassThru -Wait
+    $p = Start-Process $setup -ArgumentList '/S','/UPDATE' -PassThru
+    if (-not $p.WaitForExit(180000)) { throw 'Upgrade timed out' }
+    $p.Refresh()
     if ($p.ExitCode -ne 0) { throw "Upgrade failed ($($p.ExitCode))" }
     [void](Wait-Aster)
     if (-not $first.HasExited) { throw 'Upgrade did not stop the old app gracefully' }
