@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -20,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install NSIS
-        run: choco upgrade nsis -y --no-progress
+        run: Windows/scripts/Install-NSIS.ps1
       - name: Build and verify both architectures
         run: python Windows/tools/build.py
       - name: Build installers

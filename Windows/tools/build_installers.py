@@ -34,8 +34,8 @@ def main():
   for d in sorted(directories,key=lambda d:d.count('/'),reverse=True):uninstall.append('RMDir "$INSTDIR\\'+d.replace('/','\\')+'"')
   (stage/'install.nsh').write_text('\n'.join(install)+'\n',encoding='utf-8');(stage/'uninstall.nsh').write_text('\n'.join(uninstall)+'\n',encoding='utf-8')
   defs={'VERSION':version,'ARCH':label,'OUTPUT':OUT/f'Aster-Setup-{label}.exe','PAYLOAD':package,'ICON':OUT/'Aster.ico','BOOTSTRAP':bootstrap,'WEBVIEW_SCRIPT':WIN/'installer/Ensure-WebView2.ps1','INSTALL_FILES':stage/'install.nsh','UNINSTALL_FILES':stage/'uninstall.nsh','INSTALLED_KB':str(sum(f.stat().st_size for f in files)//1024)}
-  args=[compiler,'-V2']
-  if __import__('os').name=='nt':args=[compiler,'/V2'];args += ['/D'+k+'='+str(v) for k,v in defs.items()]
+  args=[compiler,'-V2','-INPUTCHARSET','UTF8']
+  if __import__('os').name=='nt':args=[compiler,'/V2','/INPUTCHARSET','UTF8'];args += ['/D'+k+'='+str(v) for k,v in defs.items()]
   else:args += ['-D'+k+'='+str(v) for k,v in defs.items()]
   subprocess.run(args+[str(WIN/'installer/Aster.nsi')],check=True)
   print('Created '+str(defs['OUTPUT']),flush=True)

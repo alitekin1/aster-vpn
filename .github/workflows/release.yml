@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install NSIS
-        run: choco upgrade nsis -y --no-progress
+        run: Windows/scripts/Install-NSIS.ps1
       - run: python Windows/tools/build.py
       - run: python Windows/tools/build_installers.py
       - name: Validate install and upgrade on Windows

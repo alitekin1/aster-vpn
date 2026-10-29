@@ -158,9 +158,9 @@ FunctionEnd
 Function un.onInit
  SetRegView 64
  SetShellVarContext all
- Call un.StopAster
 FunctionEnd
 Section "Uninstall"
+ Call un.StopAster
  !include "${UNINSTALL_FILES}"
  Delete "$INSTDIR\Uninstall.exe"
  Delete "$SMPROGRAMS\Aster\Aster.lnk"
