@@ -64,6 +64,6 @@ public static class AsterWindow {
     & $fixture verify $data
     if ($LASTEXITCODE -ne 0) { throw 'Uninstall removed saved settings' }
     Push-Location (Join-Path $out 'Aster-Windows-x64')
-    try { & .\Aster-Core-Tests.exe -test.v; if ($LASTEXITCODE -ne 0) { throw 'Native Windows/DPAPI tests failed' } } finally { Pop-Location }
+    try { & .\Aster-Core-Tests.exe '-test.v'; if ($LASTEXITCODE -ne 0) { throw 'Native Windows/DPAPI tests failed' } } finally { Pop-Location }
     Write-Host 'PASS: install, native WebView2 launch, graceful update/relaunch, DPAPI state preservation, uninstaller and native core tests.'
 } finally { Pop-Location }

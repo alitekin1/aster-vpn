@@ -8,7 +8,7 @@ try {
     }
     $signature = Get-AuthenticodeSignature '.\wintun.dll'
     if ($signature.Status -ne 'Valid') { throw 'Wintun driver signature is invalid.' }
-    & '.\Aster-Core-Tests.exe' -test.v
+    & '.\Aster-Core-Tests.exe' '-test.v'
     if ($LASTEXITCODE -ne 0) { throw 'Windows core / DPAPI tests failed.' }
     Write-Host 'Package checksums, signed Wintun and Windows core/DPAPI tests passed.'
     if ($AdapterTest) {
@@ -16,7 +16,7 @@ try {
         if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Run this adapter test in an elevated PowerShell window.' }
         $env:ASTER_WINDOWS_ADAPTER_TEST = '1'
         try {
-            & '.\Aster-Network-Tests.exe' -test.v
+            & '.\Aster-Network-Tests.exe' '-test.v'
             if ($LASTEXITCODE -ne 0) { throw 'Windows adapter configuration test failed.' }
         } finally { Remove-Item Env:ASTER_WINDOWS_ADAPTER_TEST -ErrorAction SilentlyContinue }
     }
