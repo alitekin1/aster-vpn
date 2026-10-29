@@ -1,0 +1,16 @@
+build/
+Engine/.deps/
+Windows/internal/packet/engine.go
+Windows/internal/packet/engine_test.go
+Windows/cmd/aster/*.syso
+*.exe
+*.dll
+*.pem
+*.key
+.env*
+state.dat
+state.json
+*.log
+__pycache__/
+.DS_Store
+.aster-publish-root

@@ -1,0 +1,8 @@
+// Aster adaptation to the pinned Xray version; same MPL-2.0 license as Xray.
+// core.Dial returns cnc.Connection, which otherwise lacks TCP half-close.
+package cnc
+
+import "github.com/xtls/xray-core/common"
+
+// CloseWrite sends EOF into Xray without discarding the response reader.
+func (c *Connection) CloseWrite() error { return common.Close(c.writer) }

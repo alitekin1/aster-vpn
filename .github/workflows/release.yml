@@ -1,0 +1,49 @@
+name: Publish signed Windows release
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: Windows/go.mod
+          cache-dependency-path: Windows/go.sum
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install NSIS
+        run: choco upgrade nsis -y --no-progress
+      - run: python Windows/tools/build.py
+      - run: python Windows/tools/build_installers.py
+      - name: Validate install and upgrade on Windows
+        shell: pwsh
+        run: Windows/scripts/Test-Installer.ps1
+      - name: Sign manifests and verify release assets
+        working-directory: Windows
+        env:
+          ASTER_UPDATE_SIGNING_KEY: ${{ secrets.ASTER_UPDATE_SIGNING_KEY }}
+        run: |
+          if (-not $env:ASTER_UPDATE_SIGNING_KEY) { throw 'Configure the release signing secret first.' }
+          go run ./tools/release sign --dir ../build/windows
+          if ($LASTEXITCODE -ne 0) { throw 'Signing failed' }
+          python tools/verify_release.py
+      - name: Publish stable release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = (Get-Content Windows/internal/buildinfo/version.go | Select-String 'const Version = "([0-9.]+)"').Matches[0].Groups[1].Value
+          $tag = "v$version"
+          gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -eq 0) { throw 'This version already has a release. Increase Version before publishing.' }
+          $assets = @('build/windows/Aster-Setup-x64.exe','build/windows/Aster-Setup-ARM64.exe','build/windows/update.json','build/windows/update.json.sig','build/windows/SHA256SUMS-Release.txt')
+          gh release create $tag @assets --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --draft --title "Aster $version" --notes-file Windows/RELEASE_NOTES.md
+          if ($LASTEXITCODE -ne 0) { throw 'Release upload failed' }
+          gh release edit $tag --repo $env:GITHUB_REPOSITORY --draft=false --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }

@@ -1,0 +1,36 @@
+name: Windows build and installer validation
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: Windows/go.mod
+          cache-dependency-path: Windows/go.sum
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install NSIS
+        run: choco upgrade nsis -y --no-progress
+      - name: Build and verify both architectures
+        run: python Windows/tools/build.py
+      - name: Build installers
+        run: python Windows/tools/build_installers.py
+      - name: Installer and native Windows tests
+        shell: pwsh
+        run: Windows/scripts/Test-Installer.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Windows-installers
+          path: build/windows/Aster-Setup-*.exe
+          if-no-files-found: warn
