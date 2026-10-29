@@ -3,7 +3,7 @@
 from pathlib import Path
 import argparse,re,shutil,subprocess,urllib.request
 ROOT=Path(__file__).resolve().parents[2];WIN=ROOT/'Windows';OUT=ROOT/'build/windows'
-def nsis(s):return str(s).replace('\\','/').replace('$','$$').replace('"','$\\"')
+def nsis(s):return str(s).replace('$','$$').replace('"','$\\"')
 def main():
  p=argparse.ArgumentParser();p.add_argument('--arch',choices=['amd64','arm64','all'],default='all');a=p.parse_args()
  compiler=shutil.which('makensis') or shutil.which('makensis.exe')

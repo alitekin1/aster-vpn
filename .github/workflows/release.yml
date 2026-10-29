@@ -17,9 +17,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Restore compiled Go cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~\AppData\Local\go-build
+            ~\go\pkg\mod
+          key: aster-windows-go-${{ hashFiles('Windows/go.sum') }}
       - name: Install NSIS
         run: Windows/scripts/Install-NSIS.ps1
       - run: python Windows/tools/build.py
+      - name: Save compiled Go cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~\AppData\Local\go-build
+            ~\go\pkg\mod
+          key: aster-windows-go-${{ hashFiles('Windows/go.sum') }}
       - run: python Windows/tools/build_installers.py
       - name: Validate install and upgrade on Windows
         shell: pwsh
