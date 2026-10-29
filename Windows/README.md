@@ -30,7 +30,7 @@ All Xray proxy and DIRECT sockets use the active adapter's `IP_UNICAST_IF`/`IPV6
 
 Limitations carried from the original engine include no raw ICMP forwarding, per-app firewall, FakeDNS or native DNS-over-TLS. Browser-managed DoH and encrypted hostnames can limit domain visibility. Arbitrary Clash rule engines/plugins and multiple endpoints in a single imported Xray outbound are rejected explicitly.
 
-Windows-specific differences: there is no persistent system service or strict-capture firewall kill switch. Administrator consent is requested when launching the app; standard users who enter a different administrator account use that account's DPAPI store. Quit releases capture; failure recovery can briefly release it. Startup-at-login registration is not implemented. Proxy and DIRECT IPv6 require a working IPv6 uplink; Windows runtime, DNS leakage, sleep/resume and driver behavior require the validation below before distribution.
+Windows-specific differences: there is no persistent system service or strict-capture firewall kill switch. Administrator consent is requested when launching the app; standard users who enter a different administrator account use that account's DPAPI store. Quit releases capture; failure recovery can briefly release it. Startup-at-login registration is not implemented. Proxy and DIRECT IPv6 require a working IPv6 uplink; Windows x64 installation, launch, upgrade and encrypted-state preservation are verified in CI. Live egress, DNS leakage, sleep/resume, interactive UAC and physical ARM64/driver behavior require the target checks in VERIFICATION.md.
 
 ## Build from source
 

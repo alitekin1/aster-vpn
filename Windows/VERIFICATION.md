@@ -13,8 +13,25 @@ Verified on 2026-10-29:
 - Both x64 and ARM64 Windows GUI executables cross-compiled. `go vet` passed for native application, platform and core packages for both targets. Windows UAC/DPI manifests and the original Aster icon are embedded.
 - Wintun archive verified against its upstream SHA-256. Final archives and packaged files are checksum-verified by the build validation.
 
-Not executed on this host: Windows DPAPI round trip, Wintun driver load and adapter configuration, native tray/UAC/dialog behavior, or Windows system-wide live traffic, DNS leakage, failure recovery and sleep/wake.
+Not executed on the macOS host: Windows-specific behavior. The later Windows CI evidence below covers DPAPI and installation/launch/upgrade/uninstall; driver capture, interactive tray/UAC/dialog behavior, live egress, DNS leakage, failure recovery and sleep/wake remain separate target checks.
  Tests use nonsecret fixtures and local loopback servers; no saved user credentials or current system VPN are used. Portable engine tests reuse the macOS engine tests, including real serialized IPv4/IPv6 TCP packets, UDP and TCP half-close. Native Windows packages include a Windows core test executable to check DPAPI on the target computer.
+
+## Windows installer / update release 0.2.0
+
+On 2026-10-29, the [Windows release workflow](https://github.com/alitekin1/aster-vpn/actions/runs/40933914248) passed on a Windows x64 runner:
+
+- Native core/DPAPI and portable packet/policy/update tests.
+- Both architecture builds and NSIS installer compilation.
+- Actual silent installation into Program Files and numeric file version verification.
+- Real WebView2 application launch and installer shutdown handshake.
+- Silent replacement while Aster was running, graceful old-process exit and automatic launch of the installed copy.
+- Verification that encrypted server/settings data survived upgrade and uninstall.
+- Uninstall registration/removal and complete installed executable removal.
+- Ed25519 manifest signing/verification and both installer size/hash checks before publishing.
+
+A separate opt-in test queried the unauthenticated public release API, verified its Ed25519 manifest, downloaded both actual installers and verified their full size/SHA-256 successfully.
+
+The stable installers are in [release v0.2.0](https://github.com/alitekin1/aster-vpn/releases/tag/v0.2.0). Installer execution was tested on x64; ARM64 binaries were cross-compiled and verified, not run on ARM hardware. Interactive UAC/SmartScreen and first-time WebView2 download still need checks on a clean physical Windows computer. Live VPN traffic, external leak observation, recovery and sleep/wake remain separate from installer CI.
 
 ## On the target Windows computer
 
